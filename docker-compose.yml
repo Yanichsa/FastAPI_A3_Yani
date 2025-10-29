@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  api:
+    # Uncomment the next line if you need to force an architecture (e.g., on Apple Silicon)
+    # platform: linux/amd64
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fastapi-a3
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      # Adjust if your app reads different env vars
+      MODEL_PATH: /models/lgbm_final_ma_copy.joblib
+      PYTHONUNBUFFERED: "1"
+      UVICORN_WORKERS: "2"
+    volumes:
+      - ./app:/app
+      - ./fetch:/fetch:ro
+      - ./preprocessing:/preprocessing:ro
+      - ./models:/models:ro
+      - ./requirements.txt:/requirements.txt:ro
+    # If your app is in app/main.py and the FastAPI instance is `app`
+    command: >
+      uvicorn app.main:app
+      --host 0.0.0.0
+      --port 8000
+      --workers ${UVICORN_WORKERS}
+      --reload
+    networks:
+      - appnet
+
+networks:
+  appnet:
+    driver: bridge

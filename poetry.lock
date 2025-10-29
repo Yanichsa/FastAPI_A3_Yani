@@ -1,0 +1,7 @@
+
+poetry config virtualenvs.in-project true
+
+poetry env use 3.11.4
+
+poetry install --no-interaction
+
